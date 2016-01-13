@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private View mView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
