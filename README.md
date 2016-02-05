@@ -1,4 +1,4 @@
 # PullToZoomScrollView
 
 
-![Screen](/show.gif)
+![Screen](/gif/show.gif)
