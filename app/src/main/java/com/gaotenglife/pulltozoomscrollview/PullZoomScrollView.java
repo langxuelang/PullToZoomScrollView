@@ -2,8 +2,12 @@ package com.gaotenglife.pulltozoomscrollview;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewParent;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.RelativeLayout;
@@ -23,19 +27,34 @@ public class PullZoomScrollView extends ScrollView{
     private int mImageViewHeight = -1;
     private int mDefaultImageViewHeight = 0;
     private double mZoomRatio = 2;
+    private int mActivePointerId = INVALID_POINTER;
+    private static final int INVALID_POINTER = -1;
+    // 滑动距离及坐标
+    private float xDistance, yDistance, xLast, yLast;
+
+    private boolean mIsdrag = false;
+
+    private float xFirst,yFirst;
+
+    private Context mContext;
+
+    private float mTouchSlop;
 
     public PullZoomScrollView(Context context) {
         super(context);
+        mContext = context;
     }
 
     public PullZoomScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+        mContext = context;
     }
 
     public PullZoomScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
+        mContext = context;
     }
     public void init() {
         mDefaultImageViewHeight = 200;
@@ -56,9 +75,65 @@ public class PullZoomScrollView extends ScrollView{
         initViewsBounds(mZoomRatio);
     }
     @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        touchListener.onTouchEvent(ev);
-        return super.onTouchEvent(ev);
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.e("scrollview",event.getAction()+"");
+        touchListener.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+//    @Override
+//    public boolean onInterceptTouchEvent(MotionEvent ev) {
+//        if(ev.getAction() == MotionEvent.ACTION_DOWN){
+//            return false;
+//        }else {
+//            return true;
+//        }
+//    }
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                xLast = event.getX();
+                yLast = event.getY();
+                xFirst = event.getX();
+                yFirst = event.getY();
+                mIsdrag = false;
+                Log.e("down","down"+mIsdrag);
+                super.onInterceptTouchEvent(event);
+
+            case MotionEvent.ACTION_MOVE:
+                xDistance = event.getX()-xFirst;
+                yDistance = event.getY()-yFirst;
+                xLast = event.getX();
+                yLast = event.getY();
+                if(Math.abs(yDistance)>mTouchSlop){
+                    Log.e("onInterceptTouchEvent","onInterceptTouchEvent"+xDistance+":"+yDistance);
+                    mIsdrag = true;
+                }else {
+                    Log.e("onInterceptTouchEvent","onInterceptTouchEvent"+xDistance+":"+yDistance);
+                    mIsdrag = false;
+                }
+                Log.e("move","move"+mIsdrag);
+                break;
+            case MotionEvent.ACTION_UP:
+                mIsdrag = false;
+                Log.e("up","up"+mIsdrag);
+                break;
+            default:
+                break;
+        }
+        if(mIsdrag){
+
+            return mIsdrag;
+        }else {
+            return mIsdrag;
+        }
+
+    }
+
+    @Override
+    public boolean canScrollVertically(int direction) {
+        return true;
     }
 
     @Override
@@ -67,6 +142,7 @@ public class PullZoomScrollView extends ScrollView{
                                    int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {
         boolean isCollapseAnimation = false;
 
+        //Log.e("overScrollBy",deltaY+"");
         isCollapseAnimation = scrollByListener.overScrollBy(deltaX, deltaY,
                 scrollX, scrollY, scrollRangeX, scrollRangeY, maxOverScrollX,
                 maxOverScrollY, isTouchEvent)
@@ -110,6 +186,8 @@ public class PullZoomScrollView extends ScrollView{
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
+
+        //Log.e("onScrollChanged","l:"+l+"t"+t);
         View firstView = (View) mImageView.getParent();
         // firstView.getTop < getPaddingTop means mImageView will be covered by top padding,
         // so we can layout it to make it shorter

@@ -15,14 +15,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private PullZoomScrollView mView;
 
     private RelativeLayout mImageContainer;
 
     private ImageView mImage;
+
+    private TextView mTextView1;
+    private TextView mTextView2;
+    private TextView mTextView3;
+    private TextView mTextView4;
+    private TextView mTextView5;
+    private TextView mTextView6;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +52,20 @@ public class MainActivity extends AppCompatActivity {
         mImageContainer = (RelativeLayout)findViewById(R.id.topimagecontainer);
         mView = (PullZoomScrollView)findViewById(R.id.scrollview);
         mImage = (ImageView)findViewById(R.id.topimage);
+        mTextView1 = (TextView)findViewById(R.id.tv1);
+        mTextView2 = (TextView)findViewById(R.id.tv2);
+        mTextView3 = (TextView)findViewById(R.id.tv3);
+        mTextView4 = (TextView)findViewById(R.id.tv4);
+        mTextView5 = (TextView)findViewById(R.id.tv5);
+        mTextView6 = (TextView)findViewById(R.id.tv6);
         mImage.setImageBitmap(ImageCrop(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher)));
         mView.mImageView = mImageContainer;
+        mTextView1.setOnClickListener(this);
+        mTextView2.setOnClickListener(this);
+        mTextView4.setOnClickListener(this);
+        mTextView3.setOnClickListener(this);
+        mTextView5.setOnClickListener(this);
+        mTextView6.setOnClickListener(this);
 
     }
 
@@ -97,5 +119,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(this,"click",Toast.LENGTH_SHORT).show();
     }
 }
