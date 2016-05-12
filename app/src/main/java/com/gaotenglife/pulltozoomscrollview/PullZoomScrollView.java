@@ -32,7 +32,7 @@ public class PullZoomScrollView extends ScrollView{
     // 滑动距离及坐标
     private float xDistance, yDistance, xLast, yLast;
 
-    private boolean mIsdrag = false;
+    private boolean mIsIntercept = false;
 
     private float xFirst,yFirst;
 
@@ -43,21 +43,26 @@ public class PullZoomScrollView extends ScrollView{
     public PullZoomScrollView(Context context) {
         super(context);
         mContext = context;
+        init();
     }
 
     public PullZoomScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+
         mContext = context;
+        init();
     }
 
     public PullZoomScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+
         mContext = context;
+        init();
     }
     public void init() {
         mDefaultImageViewHeight = 200;
+        final ViewConfiguration configuration = ViewConfiguration.get(mContext);
+        mTouchSlop = configuration.getScaledTouchSlop();
     }
     private interface OnOverScrollByListener {
         boolean overScrollBy(int deltaX, int deltaY, int scrollX,
@@ -93,42 +98,27 @@ public class PullZoomScrollView extends ScrollView{
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                xLast = event.getX();
-                yLast = event.getY();
                 xFirst = event.getX();
                 yFirst = event.getY();
-                mIsdrag = false;
-                Log.e("down","down"+mIsdrag);
+                mIsIntercept = false;
                 super.onInterceptTouchEvent(event);
 
             case MotionEvent.ACTION_MOVE:
                 xDistance = event.getX()-xFirst;
                 yDistance = event.getY()-yFirst;
-                xLast = event.getX();
-                yLast = event.getY();
                 if(Math.abs(yDistance)>mTouchSlop){
-                    Log.e("onInterceptTouchEvent","onInterceptTouchEvent"+xDistance+":"+yDistance);
-                    mIsdrag = true;
+                    mIsIntercept = true;
                 }else {
-                    Log.e("onInterceptTouchEvent","onInterceptTouchEvent"+xDistance+":"+yDistance);
-                    mIsdrag = false;
+                    mIsIntercept = false;
                 }
-                Log.e("move","move"+mIsdrag);
                 break;
             case MotionEvent.ACTION_UP:
-                mIsdrag = false;
-                Log.e("up","up"+mIsdrag);
+                mIsIntercept = false;
                 break;
             default:
                 break;
         }
-        if(mIsdrag){
-
-            return mIsdrag;
-        }else {
-            return mIsdrag;
-        }
-
+        return mIsIntercept;
     }
 
     @Override
